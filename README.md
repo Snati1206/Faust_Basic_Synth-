@@ -1,4 +1,4 @@
-# Faust_Basic_Synth-
+# Faust_Basic_Synth
 ## Faust Synth
 This is a Synth created in Faust where I tried to add different features like the following:
   ## Detune
@@ -14,4 +14,6 @@ This is a Synth created in Faust where I tried to add different features like th
   Here you have an ADSR envelope that controls the amplitude levels (at,dt,sl,rt)
   ## Harmonizer (4 octaves)
   Based in the 12 TET equation you can change the frequency of each oscillator within the range of 4 octave from -24 to +24 semi-tones (n1,n2,n3)
+
+- if you want to try the Synth, go to the Faust website and upload the code! 
   
