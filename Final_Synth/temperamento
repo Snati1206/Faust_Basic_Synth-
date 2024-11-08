@@ -1,0 +1,54 @@
+import("stdfaust.lib");
+//FORMULA TEMPERAMENTO ARMONIZADOR
+n1 = hslider("n1[style:knob]",0,-24,24,1);
+n2 = hslider("n2[style:knob]",0,-24,24,1);
+n3 = hslider("n3[style:knob]",0,-24,24,1);
+r = 2 ^ (1/12);
+gate = button("[10]gate") ;
+gain = hslider("[11]gain[style:knob]",0.5,0,1,0.001);
+
+freq = hslider("[12]freq[style:knob]",440,40,1000,0.001);
+//CONTROLES ENVOLVENTE
+at = hslider("[20]at[style:knob]",0.5,0,5,0.0001);
+dt = hslider("[21]dt[style:knob]",0,0,10,0.0001);
+sl = hslider("[22]sl[style:knob]",1,0,1,0.0001);
+rt = hslider("[23]rt[style:knob]",1.5,0,5,0.000001);
+//CONTROL AUTOWAH
+wahLevel = hslider ("[40]Wah[style:knob]",0,0,1,0.001);
+wahLFO = hslider ("[41]wahLFO[style:knob]",0,0,10,0.0001);
+wah = wahLevel*os.osc(wahLFO);
+//GANANCIAS OSCILADORES
+gainOSC1 = hslider ("[01]gainOSC1",0.5,0,1,0.0001);
+gainOSC2 = hslider ("[02]gainOSC2",0.5,0,1,0.0001);
+gainOSC3 = hslider ("[03]gainOSC3",0.5,0,1,0.0001);
+//LP-FILTER
+cut = hslider ("[30]cut",22000,80,22000,0.01);
+q = hslider ("[31]Q[style:knob]",5,1,30,0.1) : si.smoo;
+filterGain = hslider ("[32]filterGain[style:knob]",1,0,1,0.001);
+//DETUNE
+detuneRange = hslider ("[04]detune[style:knob]",0,-2,2,0.00000001);
+detuneOSC2 = (detuneRange);
+detuneOSC3 = (detuneRange*(-1));
+//FORMULA FRECUENCIA OSCILADORES INDIVIDUAL
+freq1 = freq*(r^n1)+detuneOSC2;
+freq2 = freq*(r^n2)+detuneOSC3;
+freq3 = freq*(r^n3);
+//SELECTOR DE OSCILADORES
+s1 = hslider("[011]WaveForm1",0,0,2,1);
+s2 = hslider("[021]WaveForm2",0,0,2,1);
+s3 = hslider("[031]WaveForm3",0,0,2,1);
+osc1type = os.osc(freq1),os.triangle(freq1),os.sawtooth(freq1): select3(s1);
+osc2type = os.osc(freq2),os.triangle(freq2),os.sawtooth(freq2): select3(s2);
+osc3type = os.osc(freq3),os.triangle(freq3),os.sawtooth(freq3): select3(s3);
+
+
+process = 
+(osc1type)*gainOSC1,
+(osc2type)*gainOSC2,
+(osc3type)*gainOSC3 :>
+/(3)*gain*en.adsr(at,dt,sl,rt,gate) :
+fi.resonlp(cut,1,filterGain) :
+ve.autowah(wah) <:_,_;
+
+
+
